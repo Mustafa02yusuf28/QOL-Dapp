@@ -1,46 +1,74 @@
-# Getting Started with Create React App
+# Quality of Life (QoL) Index: Verified City Audits on Solana
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Project Overview
 
-## Available Scripts
+The Quality of Life (QoL) Index is a Decentralized Physical Infrastructure Network (DePIN) built on Solana. We directly challenge the opaque real-estate market by providing transparent, immutable, crowdsourced data about local living conditions.
 
-In the project directory, you can run:
+Residents submit geo‑tagged audits (e.g., road quality, drainage), and community verifiers confirm the proof on‑site. This verifiable, human-sourced data is anchored on Solana, producing a trustworthy QoL score that informs consumers, investors, and city planners.
 
-### `npm start`
+## 💡 The Core Value Proposition
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### The Problem
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Real-estate prices are often detached from local realities. Critical data—traffic congestion, energy sufficiency, real facility quality—is scattered, centralized, and sometimes manipulated. Buyers and renters pay premiums based on speculation rather than verifiable facts.
 
-### `npm test`
+### The Solution: A Trustless Feedback Loop
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+We use Solana’s speed and low cost to build a continuous, trustless verification system:
 
-### `npm run build`
+- **Submission**: A resident submits an audit with photo proof and a rating.
+- **On‑site verification**: A separate community member visits the geo‑tagged location and verifies on-site.
+- **Immutability**: After three unique verifiers reach consensus, the record is final; $QOL rewards are issued.
+- **Blended score**: On‑chain verified UGC blends with static data (e.g., hospital/population) for a complete index.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### The Impact: Market Transparency
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Transparent, tamper‑resistant facts shift pricing power from speculation to fundamentals. Cities and developers are nudged to improve real conditions; consumers gain negotiating leverage; planners and investors get truthful signals.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🎯 Hackathon MVP: Proof of Concept
 
-### `npm run eject`
+We start with Mohali (140307) to prove the loop end‑to‑end: Submit → Verify (on‑site) → Consensus → Reward → Score Update. Small scope; real signal; clear path to scale.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## Core Architecture & Technologies
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+| Element      | Description |
+| --- | --- |
+| Frontend | React + TypeScript; Dark purple glassmorphism UI (responsive, non‑scrolling landing) |
+| Blockchain | Solana (Web3.js) with Phantom via `window.solana` |
+| Data/State | In‑memory mocks for demo; scaffolding ready to flip to Anchor/PDA |
+| Aesthetics | Leaflet map, performant Three.js background behind blur, fixed header |
+| Dependencies | Webpack 5 polyfills for crypto/stream/buffer/util (CRA compatible) |
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## The Verification Gateway: Anti‑Fraud Rules
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Verification is enabled only if:
 
-## Learn More
+- Verifier is within ≤ 200m of the audit location (Geolocation + Haversine)
+- Verifier is not the audit’s author (anti‑self‑verify)
+- Verifier hasn’t verified this audit before (anti‑double‑verify)
+- A short on‑site comment is provided
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 🛠️ Implementation Status
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+| Feature Area | Component/Service | Status | Detail |
+| --- | --- | --- | --- |
+| Wallet & UI | `WalletProvider.tsx`, UI Components | REAL | Phantom connection, responsive UI, fixed header, Leaflet map, Rewards panel (simulated ledger), Three.js background |
+| Verification Logic | `VerificationQueue.tsx` | REAL | Anti‑fraud rules, on‑site geolocation gating, 3/3 consensus tracking |
+| Data Logic | `rewardService.ts`, `tokenService.ts` | SIMULATED | Audits/verifications data, SPL transfers, rewards math kept in memory for demo |
+| Token Transfer | `tokenService.ts` | SIMULATED | Real SPL transfer code scaffolded and commented; returns a simulated tx id |
+
+## ⚙️ Development Guide
+
+### Quick Start
+
+```bash
+cd qol-dapp
+npm install
+npm start
+```
+
+Built with ❤️ for the Solana ecosystem
+
+## Further reading
+
+- See the full setup and troubleshooting guide in [SETUP.md](./SETUP.md)

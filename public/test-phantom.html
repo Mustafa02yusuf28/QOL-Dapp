@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phantom Connection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1625;
+            color: white;
+        }
+        .test-box {
+            background: rgba(139, 92, 246, 0.1);
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 12px;
+        }
+        button {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .success { color: #22c55e; }
+        .error { color: #ef4444; }
+        .info { color: #60a5fa; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Phantom Wallet Test</h1>
+    
+    <div class="test-box">
+        <h3>Step 1: Check if Phantom is Detected</h3>
+        <div id="detection-status"></div>
+        <button onclick="checkPhantom()">Check Phantom</button>
+    </div>
+    
+    <div class="test-box">
+        <h3>Step 2: Connect to Phantom</h3>
+        <div id="connection-status"></div>
+        <button onclick="connectPhantom()">Connect to Phantom</button>
+    </div>
+    
+    <div class="test-box">
+        <h3>Step 3: Connection Info</h3>
+        <div id="connection-info"></div>
+    </div>
+
+    <script>
+        let phantom = null;
+
+        function checkPhantom() {
+            const statusDiv = document.getElementById('detection-status');
+            statusDiv.innerHTML = '<p class="info">Checking...</p>';
+            
+            setTimeout(() => {
+                if (typeof window !== 'undefined' && window.solana) {
+                    if (window.solana.isPhantom) {
+                        phantom = window.solana;
+                        statusDiv.innerHTML = '<p class="success">✅ Phantom Wallet Detected!</p>';
+                    } else {
+                        statusDiv.innerHTML = '<p class="error">❌ window.solana exists but is not Phantom</p>';
+                    }
+                } else {
+                    statusDiv.innerHTML = '<p class="error">❌ Phantom not detected. Make sure Phantom extension is installed and enabled.</p>';
+                }
+            }, 100);
+        }
+
+        async function connectPhantom() {
+            const statusDiv = document.getElementById('connection-status');
+            const infoDiv = document.getElementById('connection-info');
+            
+            try {
+                statusDiv.innerHTML = '<p class="info">Connecting...</p>';
+                
+                if (!phantom) {
+                    if (window.solana && window.solana.isPhantom) {
+                        phantom = window.solana;
+                    } else {
+                        throw new Error('Phantom not detected');
+                    }
+                }
+
+                const response = await phantom.connect();
+                
+                statusDiv.innerHTML = `<p class="success">✅ Connected to Phantom!</p>`;
+                infoDiv.innerHTML = `
+                    <p><strong>Public Key:</strong> ${response.publicKey.toString()}</p>
+                    <p><strong>Network:</strong> ${phantom.isConnected ? 'Connected' : 'Not Connected'}</p>
+                `;
+                
+                console.log('Connection successful!', response);
+            } catch (err) {
+                statusDiv.innerHTML = `<p class="error">❌ Connection failed: ${err.message}</p>`;
+                infoDiv.innerHTML = `<p class="error">Error details: ${JSON.stringify(err, null, 2)}</p>`;
+                console.error('Connection error:', err);
+            }
+        }
+
+        // Auto-check on load
+        window.addEventListener('load', checkPhantom);
+    </script>
+</body>
+</html>
+
