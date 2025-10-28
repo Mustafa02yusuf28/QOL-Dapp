@@ -1,147 +1,193 @@
 # QoL DApp – Setup Guide
 
-A friendly, thorough guide to get you running locally fast — and reliably.
+A friendly, copy‑paste guide to get you running on any machine — fast and reliably.
 
 ## 1) Prerequisites
 
 - Node.js 18+ (LTS recommended)
 - npm 8+
-- A Chromium-based browser (Chrome/Brave/Edge) or Firefox
+- Browser: Chrome/Brave/Edge or Firefox
 - Phantom Wallet extension installed and unlocked
 - Internet access (Leaflet tiles + Solana RPC)
 
-Optional (for later, when making tokens real):
-- Solana CLI + a devnet wallet with a little SOL
+Optional (for later):
+- Solana CLI + a devnet wallet with a little SOL (only if you’ll mint real tokens)
 
-## 2) Clone & Install
+## 2) One‑Command Quickstart (after cloning)
 
 ```bash
-# from your workspace directory
-cd qol-dapp
-npm install
+cd qol-dapp && npm install && npm start
 ```
 
-This installs React, TypeScript, Leaflet, React Query, Solana libs, and the required Webpack polyfills.
+- Opens `http://localhost:3000`.
+- First run can take ~1 minute.
 
-## 3) Start the App
+## 3) Full Install (with cloning)
 
-```bash
+Windows (PowerShell):
+```powershell
+cd D:\Colosseum
+git clone https://github.com/Mustafa02yusuf28/QOL-Dapp.git qol-dapp
+cd qol-dapp
+npm install
 npm start
 ```
 
-- Opens `http://localhost:3000` (CRA default).
-- If it doesn’t open automatically, visit the URL manually.
-
-Tip: First run may take a minute while the dev server builds.
+macOS/Linux:
+```bash
+cd ~/workspace
+git clone https://github.com/Mustafa02yusuf28/QOL-Dapp.git qol-dapp
+cd qol-dapp
+npm install
+npm start
+```
 
 ## 4) Connect Phantom
 
-- Open the app and click “Connect Phantom”.
-- If Phantom doesn’t prompt:
-  - Ensure the extension is installed and enabled for this site.
-  - Refresh the page and try again.
-  - If you have multiple wallets, Phantom may need to be the default handler.
+- Click “Connect Phantom”. If it doesn’t prompt:
+  - Ensure Phantom is enabled for the site
+  - Refresh and try again
+  - Temporarily disable other wallet extensions
 
-No extra config is required; the app detects `window.solana` at runtime.
+No env files required — the app detects `window.solana` automatically.
 
-## 5) Pages & Expected Behavior
+## 4.1) Install connected services (Phantom, Solana) — step by step
 
-- Map View: Mohali (140307) with a dark glass UI and a lightweight 3D background.
-- Submit Audit: Choose category/metric, add rating/details/proof. Rewards are tracked (simulated).
-- Verify Data: See audits not authored by you. Verification requires:
+1) Install Phantom Wallet (browser extension)
+- Chrome Web Store: search “Phantom Wallet” (official by Phantom Technologies)
+- Create a new wallet, set a password, securely store the secret phrase
+- Pin the extension for quick access
+
+2) Switch Phantom to Devnet (for testing)
+- Open Phantom → Settings → Developer Settings → Change network → Devnet
+- Or click the network label in the wallet header and pick Devnet
+
+3) Fund your Devnet wallet (optional, only for token scripts)
+- Visit https://faucet.solana.com → choose Devnet → paste your wallet address → Request Airdrop
+
+4) (Optional) Install Solana CLI
+- macOS/Linux:
+```bash
+sh -c "$(curl -sSfL https://release.solana.com/stable/install)"
+solana --version
+solana config set --url https://api.devnet.solana.com
+solana airdrop 2 # if eligible
+```
+- Windows: use WSL (Ubuntu) then run the same commands above
+
+5) (Optional) Install ts-node to run scripts
+```bash
+npm install --global ts-node typescript
+```
+
+6) (Optional) Run the token helper script (devnet)
+```bash
+# Edit scripts/create-token.ts with your funded devnet keypair per comments
+npx ts-node scripts/create-token.ts
+```
+
+7) Browser permissions
+- Allow location (for on-site verification)
+- Ensure Phantom is enabled for the site
+- If multiple wallets installed, make Phantom the default handler
+
+## 5) What you should see
+
+- Map View: Mohali (140307) with dark, glass UI and a subtle 3D background
+- Submit Audit: Choose metric, add rating/details/proof (rewards tracked in UI)
+- Verify Data: Only enabled when:
   - Wallet connected
-  - On‑site presence (≤ 200m) via browser Geolocation
-  - A short on‑site comment
-  - Not previously verified by you
+  - Within ≤ 200m (Geolocation → Haversine distance)
+  - Not your own audit and not previously verified by you
+  - A short on‑site comment is provided
 
-## 6) Geolocation Notes
+## 6) Geolocation tips
 
-- The “Use my location” button requests your GPS coordinates via the browser.
-- On desktop, accuracy varies (Wi‑Fi/IP based). On mobile, it’s much better.
-- HTTPS is typically required for Geolocation on the web. `localhost` is treated like secure context by most browsers.
-- If you deny permission, verification will remain disabled until you allow it.
+- “Use my location” requests GPS via the browser
+- Desktop accuracy varies; mobile is better
+- `localhost` counts as a secure context for Geolocation in most browsers
+- If denied, re‑enable in site settings
 
-## 7) Configuration You Might Care About
+## 7) Configuration knobs (optional)
 
-- Token settings: `src/services/tokenService.ts`
-  - `TOKEN_MINT`, `RPC_ENDPOINT` (currently set for simulated flow)
-- Map/locations: `src/components/InteractiveMap.tsx` and `src/data/metrics.ts`
-- Theme: `src/index.css` (glassmorphism tokens and globals)
+- Token service: `src/services/tokenService.ts`
+  - `TOKEN_MINT`, `RPC_ENDPOINT` (for real tokens later)
+- Map/data: `src/components/InteractiveMap.tsx`, `src/data/metrics.ts`
+- Theme: `src/index.css`
 
-No `.env` is required for the demo flow.
-
-## 8) Build for Production
+## 8) Build a production bundle
 
 ```bash
 npm run build
 ```
 
-- Outputs production assets to `build/`.
-- Serve with any static host (Netlify/Vercel/Nginx). For Geolocation, prefer HTTPS.
+- Outputs to `build/`
+- Serve on HTTPS (recommended for Geolocation)
 
-## 9) Windows-Specific Tips
+## 9) Common issues & fixes (copy‑paste)
 
-- If you’re using PowerShell/CMD and scripts don’t start, ensure you’re inside the `qol-dapp` directory before running `npm start`.
-- If another process already uses port 3000, CRA will prompt to use a different port.
+- Phantom doesn’t open:
+```bash
+# Reload page and click Connect again; ensure Phantom is enabled
+```
 
-## 10) Troubleshooting
+- Webpack 5 polyfill errors (crypto/stream/buffer/util):
+```bash
+rm -rf node_modules package-lock.json # macOS/Linux
+del /s /q node_modules\* & del package-lock.json # Windows CMD
+npm install
+```
 
-- Phantom doesn’t open
-  - Refresh the page and click Connect again
-  - Ensure Phantom is the active wallet extension
-  - Try disabling other wallet extensions temporarily
+- `@solana/spl-token` not found:
+```bash
+npm install @solana/spl-token
+```
 
-- White screen / Webpack errors about `crypto` or `stream`
-  - We ship Webpack 5 polyfills via `config-overrides.js`
-  - Clean install: delete `node_modules/` and run `npm install`
+- TypeScript deprecation warning about moduleResolution:
+```json
+// tsconfig.json already uses "moduleResolution": "bundler"
+```
 
-- `@solana/spl-token` not found
-  - Run `npm install @solana/spl-token`
-  - Ensure Node 18+ and reinstall if necessary
+- Geolocation inaccurate/blocked:
+```bash
+# Allow location permission in the browser; try on mobile for better GPS
+```
 
-- Geolocation blocked or inaccurate
-  - Allow location in the browser prompt and site settings
-  - Use a mobile device for better GPS accuracy
-  - Remember: verification requires ≤ 200m proximity
+- Layout overlaps / extra scroll:
+```bash
+# Header spacing and overflow are tuned in index.css and App; avoid changing fixed heights
+```
 
-- “Still scrolling under the header” or layout overlaps
-  - This project sets global `overflow`/`z-index` and fixed header spacing in `index.css` and `App.tsx`
-  - If you changed heights, adjust the main padding-top or card heights accordingly
+## 10) Making token rewards real (later)
 
-## 11) Making Token Rewards Real (Later)
-
-Right now, token transfers are simulated for safety. When you’re ready:
-
-1. Create an SPL token mint for $QOL (devnet to start)
+Steps (high level):
+1. Create an SPL token mint on devnet (or mainnet later)
 2. Fund a treasury wallet with tokens
-3. Configure `TOKEN_MINT` and RPC in `src/services/tokenService.ts`
-4. Move transfer signing to a minimal backend (don’t expose private keys in the frontend)
-5. Uncomment the transfer logic (ATA creation + transfer) and point the frontend to your backend API
+3. Set `TOKEN_MINT` and RPC in `src/services/tokenService.ts`
+4. Move transfer signing to a tiny backend (never put keys in frontend)
+5. Uncomment transfer logic (create ATA + transfer) and call your backend
 
-See:
-- `TOKEN_SETUP_GUIDE.md`
-- `IMPLEMENT_REAL_TOKENS.md`
+Docs:
+- `idea/TOKEN_SETUP_GUIDE.md`
+- `idea/IMPLEMENT_REAL_TOKENS.md`
 
-## 12) What’s Included vs. What’s Not
+## 11) What’s included vs not (demo mode)
 
 Included:
-- Real Phantom connection and guards around verification
-- Modern UI with dark glassmorphism
-- Leaflet map and 3D background under blur
+- Real Phantom connection + verification guards
+- Modern UI (dark glassmorphism), Leaflet map, 3D background under blur
 - On‑site gating for verification (Geolocation + distance)
 
-Not included (by design, for demo safety):
+Not included (by design for safety):
 - On‑chain data storage
-- Real SPL transfers (scaffolded and easy to enable later)
-- Backend APIs (you can add Firestore/Express as needed)
+- Real SPL transfers (scaffolded, easily enabled later)
+- Backend APIs (plug in Firestore/Express if needed)
 
-## 13) Contributing / Customizing
+## 12) Customize quickly
 
-- Adjust the verification radius in `VerificationQueue.tsx` (default 200m)
-- Add more metrics and locations in `src/data/metrics.ts`
-- Wire a real data source (Firestore/your API) by replacing the mock fetch functions
-
-If you get stuck, open an issue with your OS, Node version, and the exact error text. We’ll help you get unblocked quickly.
+- Change verification radius in `VerificationQueue.tsx` (default 200m)
+- Extend metrics/locations in `src/data/metrics.ts`
+- Replace mock fetch/verify with your API when ready
 
 ---
 
